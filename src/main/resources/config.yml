@@ -1,0 +1,7 @@
+Enabled: false
+Remove Worldguard Folders: true
+Save: false
+Whitelist:
+  - world
+  - plots
+  - arena_world
