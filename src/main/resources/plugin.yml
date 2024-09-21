@@ -2,3 +2,4 @@ name: AutoWorldDeleter
 version: '0.1'
 main: me.isaac.autoWorldDeleter.AutoWorldDeleter
 api-version: '1.21'
+load: STARTUP

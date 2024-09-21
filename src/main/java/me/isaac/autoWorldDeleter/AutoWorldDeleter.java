@@ -1,7 +1,6 @@
 package me.isaac.autoWorldDeleter;
 
 import org.bukkit.Bukkit;
-import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -11,7 +10,6 @@ public final class AutoWorldDeleter extends JavaPlugin {
 
     List<String> worldList;
     boolean save, worldGuard;
-    World safeWorld;
 
     @Override
     public void onEnable() {
@@ -29,34 +27,28 @@ public final class AutoWorldDeleter extends JavaPlugin {
         }
         save = getConfig().getBoolean("Save", false);
         worldGuard = getConfig().getBoolean("Remove Worldguard Folders", true);
-        for (String s : worldList) {
-            safeWorld = Bukkit.getWorld(s);
-            if (safeWorld != null)
-                break;
-        }
-        if (safeWorld == null) {
-            Bukkit.getLogger().severe("AutoWorldDeleter: Couldn't find a safe world in the Whitelist.");
+
+        if (worldList == null) return;
+        File worldsFolder = new File("worlds");
+        if (!worldsFolder.exists()) {
+            Bukkit.getLogger().severe("Couldn't find world folder!");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
-        safeWorld = Bukkit.getWorld(getConfig().getStringList("Whitelist").getFirst());
+
+        for (File worldFolder : worldsFolder.listFiles()) {
+            if (worldList.contains(worldFolder.getName())) continue;
+            Bukkit.getLogger().info("World folder deleted: " + worldFolder.getName() + " " + deleteFolder(worldFolder));
+            if (!worldGuard) continue;
+            Bukkit.getLogger().info("WorldGuard folder deleted: " + worldFolder.getName() + " " + deleteFolder(new File("plugins" + File.separator + "WorldGuard" + File.separator + "worlds" + File.separator + worldFolder.getName())));
+        }
+
+
     }
 
     @Override
     public void onDisable() {
-        if (worldList == null) return;
-        for (World world : Bukkit.getWorlds()) {
-            if (worldList.contains(world.getName())) continue;
-            unloadWorld(world);
-            Bukkit.getLogger().info("World folder deleted: " + world.getName() + " " + deleteFolder(world.getWorldFolder()));
-            if (!worldGuard) continue;
-            deleteFolder(new File("plugins" + File.separator + "WorldGuard" + File.separator + "worlds" + File.separator + world.getName()));
-        }
-    }
 
-    public void unloadWorld(World world) {
-        world.getPlayers().forEach(player -> player.teleport(safeWorld.getSpawnLocation()));
-        Bukkit.getServer().unloadWorld(world, save);
     }
 
     public boolean deleteFolder(File path) {
