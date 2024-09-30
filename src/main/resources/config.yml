@@ -1,6 +1,7 @@
 Enabled: false
 Remove Worldguard Folders: true
 Save: false
+World Folder: worlds
 Whitelist:
   - world
   - plots

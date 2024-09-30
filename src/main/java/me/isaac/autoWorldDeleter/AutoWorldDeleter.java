@@ -28,8 +28,15 @@ public final class AutoWorldDeleter extends JavaPlugin {
         save = getConfig().getBoolean("Save", false);
         worldGuard = getConfig().getBoolean("Remove Worldguard Folders", true);
 
-        if (worldList == null) return;
-        File worldsFolder = new File("worlds");
+        String worldFolderPath = getConfig().getString("World Folder");
+
+        if (worldFolderPath == null) {
+            Bukkit.getLogger().severe("AutoWorldDeleter: Could not find world folder. Worlds can only be deleted from the world folder.");
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
+
+        File worldsFolder = new File(worldFolderPath);
         if (!worldsFolder.exists()) {
             Bukkit.getLogger().severe("Couldn't find world folder!");
             Bukkit.getPluginManager().disablePlugin(this);
